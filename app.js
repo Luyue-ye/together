@@ -77,7 +77,7 @@ function nav(active) {
 function mount() {
   if (!S.uid) return;
   if (route) route.destroy();
-  $('sheetRoot').replaceChildren();
+  $('sheetRoot').replaceChildren(); document.body.classList.remove('sheet-open');
   const [name, arg] = (location.hash.replace(/^#/, '') || 'home').split('/');
   const ctx = route = makeCtx();
   let view, active = name;

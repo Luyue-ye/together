@@ -95,13 +95,13 @@ export const ICON = {
 };
 export function toast(msg) { const el = h('div', { class: 'toast', text: msg, role: 'status' }); document.body.append(el); setTimeout(() => el.remove(), 2800); }
 export function openSheet(title, ...content) {
-  const close = () => $('sheetRoot').replaceChildren();
+  const close = () => { $('sheetRoot').replaceChildren(); document.body.classList.remove('sheet-open'); };
   const bg = h('div', { class: 'sheet-bg', onclick: e => { if (e.target === bg) close(); } },
     h('div', { class: 'sheet', role: 'dialog', 'aria-label': title }, h('div', { class: 'grab' }), title ? h('h3', { text: title }) : null, ...content));
-  $('sheetRoot').replaceChildren(bg);
+  $('sheetRoot').replaceChildren(bg); document.body.classList.add('sheet-open');
   return close;
 }
-export const closeSheet = () => $('sheetRoot').replaceChildren();
+export const closeSheet = () => { $('sheetRoot').replaceChildren(); document.body.classList.remove('sheet-open'); };
 export async function sha256(s) {
   const b = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s));
   return [...new Uint8Array(b)].map(x => x.toString(16).padStart(2, '0')).join('');

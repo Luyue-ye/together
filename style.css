@@ -68,7 +68,7 @@ a{color:var(--pri)}
 
 /* forms */
 .field{display:flex;flex-direction:column;gap:6px;font-size:13px;color:var(--muted)}
-.field input,.field textarea,.field select,.inp{width:100%;padding:12px 14px;border:1px solid var(--line);border-radius:14px;background:#fff;font-size:16px;color:var(--ink)}
+.field input,.field textarea,.field select,.inp{box-sizing:border-box;min-width:0;max-width:100%;width:100%;padding:12px 14px;border:1px solid var(--line);border-radius:14px;background:#fff;font-size:16px;color:var(--ink)}
 .field textarea{min-height:84px;resize:vertical}
 .two{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
 .err{color:var(--rose);font-size:13px;min-height:18px;line-height:1.5}
@@ -166,7 +166,9 @@ a{color:var(--pri)}
 
 /* sheet / toast */
 .sheet-bg{position:fixed;inset:0;background:rgba(40,40,60,.32);z-index:60;display:flex;align-items:flex-end;justify-content:center}
-.sheet{background:#fff;width:100%;max-width:540px;border-radius:26px 26px 0 0;padding:14px 20px calc(26px + var(--safe-bot));max-height:92vh;overflow:auto}
+.sheet{background:#fff;width:100%;max-width:540px;border-radius:26px 26px 0 0;padding:14px 20px calc(40px + var(--safe-bot));max-height:92vh;max-height:92dvh;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;box-sizing:border-box}
+.sheet-bg{touch-action:pan-y}
+body.sheet-open{overflow:hidden}
 .sheet .grab{width:40px;height:5px;border-radius:3px;background:#e2ddd2;margin:0 auto 14px}
 .sheet h3{font-family:var(--brand);font-weight:700;font-size:21px;margin:0 0 14px}
 @media(min-width:640px){.sheet-bg{align-items:center}.sheet{border-radius:26px}}
@@ -267,3 +269,8 @@ html[dir=rtl] .ss{transform:scaleX(-1)}
 
 .care{background:linear-gradient(160deg,#fff7ee,#f3f1ff)}
 a.btn{text-decoration:none}
+
+/* iPhone 的日期/时间框默认比格子宽，会撑出屏幕 */
+input[type=date],input[type=time],input[type=datetime-local]{-webkit-appearance:none;appearance:none;min-height:48px;text-align:left;display:block}
+input[type=date]::-webkit-date-and-time-value,input[type=time]::-webkit-date-and-time-value{text-align:left}
+.field{min-width:0}
