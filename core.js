@@ -115,6 +115,8 @@ export const S = {
   scene: store.get('tg-scene', 'day'), tab: store.get('tg-tabs', { study: 'rooms', life: 'hang' }),
   confField: 'all', confMine: false, libFilter: 'all', lifeTag: 'all', pushOn: store.get('tg-push', false)
 };
+// 今天在做：内置的用翻译，自定义的（c: 开头）直接显示用户写的字
+export const kindLabel = k => KINDS.includes(k) ? t('kind_' + k) : (typeof k === 'string' && k.startsWith('c:') ? k.slice(2) : t('justHere'));
 export const nameOf = uid => (uid && S.profiles[uid] && S.profiles[uid].name) || t('someone');
 export const colorOf = uid => (uid && S.profiles[uid] && S.profiles[uid].color) || COLORS[[...String(uid || '?')].reduce((a, c) => a + c.charCodeAt(0), 0) % COLORS.length];
 export const avatar = (uid, cls = '') => h('span', { class: 'av ' + cls, style: `background:${colorOf(uid)}`, title: nameOf(uid), text: [...nameOf(uid)][0] || '?' });

@@ -1,5 +1,5 @@
 // 自习室：场景、团子、计时、休息、聊天、递茶
-import { S, B, t, h, svg, ICON, num, dayKey, fmtMMSS, fmtTime, toast, nameOf, colorOf, mochi, openSheet, closeSheet, store, clean, startOfToday, KINDS, DURS, BREAKS, BREAK_DURS, CHEERS } from './core.js';
+import { S, B, t, h, svg, ICON, num, dayKey, fmtMMSS, fmtTime, toast, nameOf, colorOf, mochi, openSheet, closeSheet, store, clean, startOfToday, kindLabel, KINDS, DURS, BREAKS, BREAK_DURS, CHEERS } from './core.js';
 import { joinRoomFlow } from './study.js';
 import { fmtDur } from './core.js';
 const fmtDurShort = m => fmtDur(Math.floor(m / 30) * 30);
@@ -115,7 +115,7 @@ export function viewRoom(ctx, id) {
     const seats = h('div', { class: 'seats' });
     residents.slice(0, 9).forEach(r => {
       const p = r.p, act = p.st === 'w' ? 'write' : p.st === 'b' ? (BREAKS.includes(p.a) ? p.a : 'water') : 'idle';
-      const what = p.st === 'w' ? t('kind_' + p.k) : p.st === 'b' ? t('brk_' + act) : t('justHere');
+      const what = p.st === 'w' ? kindLabel(p.k) : p.st === 'b' ? t('brk_' + act) : t('justHere');
       const seat = h('div', { class: 'seat' + (r.me ? '' : ' other'), 'data-uid': r.uid },
         h('div', { style: 'position:absolute;top:-8px' }, mochi(act, colorOf(r.uid))),
         h('div', { class: 'desk' }),
@@ -152,7 +152,13 @@ export function viewRoom(ctx, id) {
     if (m.st === 'idle') {
       const kinds = h('div', { class: 'chips' }), durs = h('div', { class: 'chips' });
       const draw = () => {
-        kinds.replaceChildren(...KINDS.map(k => h('button', { class: 'chip' + (m.kind === k ? ' on' : ''), text: t('kind_' + k), onclick: () => { m.kind = k; saveMine(); draw(); } })));
+        const mineK = store.get('tg-kinds', []);
+        const pick = k => h('button', { class: 'chip' + (m.kind === k ? ' on' : ''), text: kindLabel(k), onclick: () => { m.kind = k; saveMine(); draw(); } });
+        const del = k => h('button', { class: 'chip', style: 'padding:0 9px;color:var(--muted)', 'aria-label': t('delete'), text: '×', onclick: () => { store.set('tg-kinds', mineK.filter(x => x !== k)); if (m.kind === k) { m.kind = KINDS[0]; saveMine(); } draw(); } });
+        const inp = h('input', { class: 'inp', maxlength: '12', placeholder: t('customTagPh'), style: 'height:36px;padding:0 12px;font-size:14px;width:130px;border-radius:999px' });
+        const add = () => { const v = clean(inp.value, 12); if (!v) return; const k = 'c:' + v; if (!mineK.includes(k)) store.set('tg-kinds', [...mineK, k].slice(-8)); m.kind = k; saveMine(); draw(); };
+        inp.onkeydown = e => { if (e.key === 'Enter') { e.preventDefault(); add(); } };
+        kinds.replaceChildren(...KINDS.map(pick), ...mineK.flatMap(k => m.kind === k ? [pick(k), del(k)] : [pick(k)]), inp, h('button', { type: 'button', class: 'chip dash', 'aria-label': t('addTag'), text: '+', onclick: add }));
         durs.replaceChildren(...DURS.map(d => h('button', { class: 'chip' + (m.dur === d ? ' on' : ''), text: d ? t('minN', num(d)) : t('open'), onclick: () => { m.dur = d; saveMine(); draw(); } })));
       };
       draw();
@@ -164,7 +170,7 @@ export function viewRoom(ctx, id) {
       const writing = m.st === 'writing';
       timerBox.replaceChildren(h('div', { class: 'card row', style: 'gap:12px' },
         h('div', { class: 'grow' },
-          h('div', { class: 'small muted', text: writing ? `${t('kind_' + m.kind)} · ${m.dur ? t('minN', num(m.dur)) : t('open')}` : `${t('onBreak')} · ${t('brk_' + m.act)}` }),
+          h('div', { class: 'small muted', text: writing ? `${kindLabel(m.kind)} · ${m.dur ? t('minN', num(m.dur)) : t('open')}` : `${t('onBreak')} · ${t('brk_' + m.act)}` }),
           h('div', { class: 'timer-big', 'data-tick': '1', 'data-s': m.s, 'data-e': m.e, 'aria-live': 'off', text: '00:00' })),
         writing ? h('button', { class: 'btn sm soft', text: t('takeBreak'), onclick: breakSheet }) : h('button', { class: 'btn sm soft', text: t('again'), onclick: startRound }),
         h('button', { class: 'btn sm', text: writing ? t('end') : t('lightsOff'), onclick: () => writing ? endRound(false) : stopAll() })));
