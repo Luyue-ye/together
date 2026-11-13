@@ -1,0 +1,199 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+    "admins": {
+      ".read": "auth != null && auth.token.email_verified == true"
+    },
+    "profiles": {
+      ".read": "auth != null && auth.token.email_verified == true",
+      "$uid": {
+        ".write": "auth != null && auth.token.email_verified == true && $uid === auth.uid",
+        ".validate": "newData.child('name').isString() && newData.child('name').val().length > 0 && newData.child('name').val().length <= 24"
+      }
+    },
+    "presence": {
+      ".read": "auth != null && auth.token.email_verified == true",
+      "$uid": {
+        ".write": "auth != null && auth.token.email_verified == true && $uid === auth.uid"
+      }
+    },
+    "cheers": {
+      "$to": {
+        ".read": "auth != null && auth.token.email_verified == true && $to === auth.uid",
+        "$id": {
+          ".write": "auth != null && auth.token.email_verified == true && ((!data.exists() && newData.child('from').val() === auth.uid) || ($to === auth.uid && !newData.exists()))",
+          ".validate": "newData.child('e').isNumber() && newData.child('e').val() >= 0 && newData.child('e').val() <= 3"
+        }
+      }
+    },
+    "rooms": {
+      ".read": "auth != null && auth.token.email_verified == true",
+      "$id": {
+        ".write": "auth != null && auth.token.email_verified == true && ((!data.exists() && newData.child('host').val() === auth.uid) || data.child('host').val() === auth.uid || (root.child('admins').child(auth.uid).val() === true && !newData.exists()))",
+        ".validate": "newData.child('name').isString() && newData.child('name').val().length <= 40 && (!data.exists() || newData.child('host').val() === data.child('host').val())"
+      }
+    },
+    "roomSecrets": {
+      "$id": {
+        ".read": false,
+        ".write": "auth != null && auth.token.email_verified == true && ((!data.exists() && root.child('rooms').child($id).child('host').val() === auth.uid) || (!newData.exists() && (root.child('rooms').child($id).child('host').val() === auth.uid || root.child('admins').child(auth.uid).val() === true)))",
+        ".validate": "newData.isString() && newData.val().length === 64"
+      }
+    },
+    "roomMembers": {
+      "$id": {
+        "$uid": {
+          ".read": "auth != null && auth.token.email_verified == true && $uid === auth.uid",
+          ".write": "auth != null && auth.token.email_verified == true && $uid === auth.uid && (newData.val() === root.child('roomSecrets').child($id).val() || !newData.exists())"
+        }
+      }
+    },
+    "myRooms": {
+      "$uid": {
+        ".read": "auth != null && auth.token.email_verified == true && $uid === auth.uid",
+        ".write": "auth != null && auth.token.email_verified == true && $uid === auth.uid",
+        "$rid": {
+          ".validate": "newData.val() === true && root.child('roomMembers').child($rid).child($uid).exists()"
+        }
+      }
+    },
+    "chats": {
+      "$room": {
+        ".read": "auth != null && auth.token.email_verified == true && ($room === 'public' || root.child('roomMembers').child($room).child(auth.uid).exists())",
+        ".write": "auth != null && auth.token.email_verified == true && !newData.exists() && (root.child('rooms').child($room).child('host').val() === auth.uid || root.child('admins').child(auth.uid).val() === true)",
+        "$msg": {
+          ".write": "auth != null && auth.token.email_verified == true && (($room === 'public' || root.child('roomMembers').child($room).child(auth.uid).exists()) && !data.exists() && newData.child('uid').val() === auth.uid || (root.child('admins').child(auth.uid).val() === true && !newData.exists()))",
+          ".validate": "newData.child('text').isString() && newData.child('text').val().length > 0 && newData.child('text').val().length <= 500"
+        }
+      }
+    },
+    "confFollows": {
+      ".read": "auth != null && auth.token.email_verified == true",
+      "$c": {
+        "$uid": {
+          ".write": "auth != null && auth.token.email_verified == true && $uid === auth.uid",
+          ".validate": "newData.val() === true"
+        }
+      }
+    },
+    "confCollab": {
+      ".read": "auth != null && auth.token.email_verified == true",
+      "$c": {
+        "$uid": {
+          ".write": "auth != null && auth.token.email_verified == true && $uid === auth.uid",
+          ".validate": "newData.child('note').isString() && newData.child('note').val().length <= 200"
+        }
+      }
+    },
+    "customConfs": {
+      ".read": "auth != null && auth.token.email_verified == true",
+      "$id": {
+        ".write": "auth != null && auth.token.email_verified == true && ((!data.exists() && newData.child('by').val() === auth.uid) || (!newData.exists() && (data.child('by').val() === auth.uid || root.child('admins').child(auth.uid).val() === true)))",
+        ".validate": "newData.child('short').isString() && newData.child('short').val().length <= 30"
+      }
+    },
+    "folders": {
+      ".read": "auth != null && auth.token.email_verified == true",
+      "$id": {
+        ".write": "auth != null && auth.token.email_verified == true && ((!data.exists() && newData.child('owner').val() === auth.uid) || data.child('owner').val() === auth.uid || (root.child('admins').child(auth.uid).val() === true && !newData.exists()))",
+        ".validate": "newData.child('name').isString() && newData.child('name').val().length <= 40 && newData.child('kind').val().matches(/^(co|own)$/) && (!data.exists() || newData.child('owner').val() === data.child('owner').val())"
+      }
+    },
+    "links": {
+      ".read": "auth != null && auth.token.email_verified == true",
+      "$f": {
+        ".write": "auth != null && auth.token.email_verified == true && !newData.exists() && (root.child('folders').child($f).child('owner').val() === auth.uid || root.child('admins').child(auth.uid).val() === true)",
+        "$l": {
+          ".write": "auth != null && auth.token.email_verified == true && ((!data.exists() && newData.child('by').val() === auth.uid && (root.child('folders').child($f).child('kind').val() === 'co' || root.child('folders').child($f).child('owner').val() === auth.uid)) || (!newData.exists() && (data.child('by').val() === auth.uid || root.child('folders').child($f).child('owner').val() === auth.uid || root.child('admins').child(auth.uid).val() === true)))",
+          ".validate": "newData.child('url').isString() && newData.child('url').val().matches(/^https?:\\/\\//) && newData.child('url').val().length <= 500 && newData.child('title').val().length <= 100"
+        }
+      }
+    },
+    "hangouts": {
+      ".read": "auth != null && auth.token.email_verified == true",
+      ".indexOn": [
+        "created"
+      ],
+      "$id": {
+        ".write": "auth != null && auth.token.email_verified == true && ((!data.exists() && newData.child('host').val() === auth.uid) || (!newData.exists() && (data.child('host').val() === auth.uid || root.child('admins').child(auth.uid).val() === true)))",
+        ".validate": "newData.child('mode').val().matches(/^(plan|idea|free)$/) && newData.child('title').isString() && newData.child('title').val().length <= 80"
+      }
+    },
+    "hangJoins": {
+      ".read": "auth != null && auth.token.email_verified == true",
+      "$id": {
+        ".write": "auth != null && auth.token.email_verified == true && !newData.exists() && (root.child('hangouts').child($id).child('host').val() === auth.uid || root.child('admins').child(auth.uid).val() === true)",
+        "$uid": {
+          ".write": "auth != null && auth.token.email_verified == true && $uid === auth.uid && (root.child('hangouts').child($id).exists() || !newData.exists())",
+          ".validate": "newData.val() === true"
+        }
+      }
+    },
+    "help": {
+      ".read": "auth != null && auth.token.email_verified == true",
+      "$id": {
+        ".write": "auth != null && auth.token.email_verified == true && ((!data.exists() && newData.child('by').val() === auth.uid) || data.child('by').val() === auth.uid || (root.child('admins').child(auth.uid).val() === true && !newData.exists()))",
+        ".validate": "newData.child('text').isString() && newData.child('text').val().length <= 300 && (!data.exists() || newData.child('by').val() === data.child('by').val())"
+      }
+    },
+    "helpOffers": {
+      ".read": "auth != null && auth.token.email_verified == true",
+      "$id": {
+        ".write": "auth != null && auth.token.email_verified == true && !newData.exists() && (root.child('help').child($id).child('by').val() === auth.uid || root.child('admins').child(auth.uid).val() === true)",
+        "$uid": {
+          ".write": "auth != null && auth.token.email_verified == true && $uid === auth.uid && (root.child('help').child($id).exists() || !newData.exists())",
+          ".validate": "newData.val() === true"
+        }
+      }
+    },
+    "mood": {
+      "$day": {
+        "$uid": {
+          ".read": "auth != null && auth.token.email_verified == true && $uid === auth.uid",
+          ".write": "auth != null && auth.token.email_verified == true && $uid === auth.uid",
+          ".validate": "newData.child('tired').isNumber() && newData.child('tired').val() >= 0 && newData.child('tired').val() <= 10 && newData.child('happy').isNumber() && newData.child('happy').val() >= 0 && newData.child('happy').val() <= 10"
+        }
+      }
+    },
+    "moodDigest": {
+      ".read": "auth != null && auth.token.email_verified == true"
+    },
+    "board": {
+      ".read": "auth != null && auth.token.email_verified == true",
+      "$day": {
+        "$id": {
+          ".write": "auth != null && auth.token.email_verified == true && ((!data.exists() && newData.child('text').isString() && ((newData.child('anon').val() === true && !newData.hasChild('by')) || newData.child('by').val() === auth.uid)) || (!newData.exists() && (data.child('by').val() === auth.uid || root.child('admins').child(auth.uid).val() === true)))",
+          ".validate": "newData.child('text').isString() && newData.child('text').val().length > 0 && newData.child('text').val().length <= 140",
+          "hugs": {
+            "$uid": {
+              ".write": "auth != null && auth.token.email_verified == true && $uid === auth.uid",
+              ".validate": "newData.val() === true"
+            }
+          }
+        }
+      }
+    },
+    "memos": {
+      "$uid": {
+        ".read": "auth != null && auth.token.email_verified == true && $uid === auth.uid",
+        ".write": "auth != null && auth.token.email_verified == true && $uid === auth.uid",
+        "$id": {
+          ".validate": "newData.child('text').isString() && newData.child('text').val().length <= 120"
+        }
+      }
+    },
+    "stats": {
+      "$uid": {
+        ".read": "auth != null && auth.token.email_verified == true && $uid === auth.uid",
+        ".write": "auth != null && auth.token.email_verified == true && $uid === auth.uid"
+      }
+    },
+    "tokens": {
+      "$uid": {
+        ".read": "auth != null && auth.token.email_verified == true && $uid === auth.uid",
+        ".write": "auth != null && auth.token.email_verified == true && $uid === auth.uid"
+      }
+    }
+  }
+}
