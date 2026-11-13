@@ -170,7 +170,11 @@ async function firebaseBackend() {
   };
   return {
     demo: false,
-    onAuth: cb => A.onAuthStateChanged(auth, cb),
+    // 刚点完验证链接再打开 App 时，旧的登录凭证里还写着「未验证」，数据库会拒绝读写；这里先换一张新凭证
+    onAuth: cb => A.onAuthStateChanged(auth, async u => {
+      if (u && u.emailVerified) { try { const r = await u.getIdTokenResult(); if (!r.claims.email_verified) await u.getIdToken(true); } catch (e) { } }
+      cb(u);
+    }),
     current: () => auth.currentUser,
     signUp: async (e, p) => { const c = await A.createUserWithEmailAndPassword(auth, e, p); await A.sendEmailVerification(c.user); },
     signIn: (e, p) => A.signInWithEmailAndPassword(auth, e, p),
