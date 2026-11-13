@@ -41,7 +41,7 @@ const BODY = {
 if (n >= 3 && !digest.pushed) {
   const tokens = [];
   for (const [uid, list] of Object.entries((await val('tokens')) || {})) for (const [id, tk] of Object.entries(list || {})) if (tk && tk.token) tokens.push({ uid, id, token: tk.token, lang: BODY[tk.lang] ? tk.lang : 'en' });
-  const msgs = tokens.map(x => ({ token: x.token, webpush: { notification: { title: 'Together 同窗 · 21:00', body: BODY[x.lang](digest), icon: APP ? APP + 'icons/icon-192.png' : undefined }, ...(APP ? { fcmOptions: { link: APP + '#digest' } } : {}) } }));
+  const msgs = tokens.map(x => ({ token: x.token, webpush: { notification: { title: 'Together 同窗 · 21:00', body: BODY[x.lang](digest), icon: APP ? APP + 'icon-192.png' : undefined }, ...(APP ? { fcmOptions: { link: APP + '#digest' } } : {}) } }));
   let ok = 0;
   for (let i = 0; i < msgs.length; i += 500) {
     const res = await admin.messaging().sendEach(msgs.slice(i, i + 500));
