@@ -1,4 +1,5 @@
 // 我：名字、团子颜色、语言、推送、安装、退出
+import { showCreatorNote, noteTitle } from './intro.js';
 import { S, B, t, h, svg, ICON, toast, mochi, colorOf, nameOf, COLORS, LANGS, lang, setLang, store, clean, DEMO } from './core.js';
 
 const isStandalone = () => matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
@@ -28,6 +29,7 @@ export function viewMe(ctx, rerender) {
       h('div', { class: 'chips' }, LANGS.map(([c, l]) => h('button', { class: 'chip' + (lang === c ? ' on' : ''), lang: c, text: l, onclick: () => { setLang(c); if (S.uid) B.set(`profiles/${S.uid}/lang`, c).catch(() => { }); rerender(); } }))),
       h('div', { class: 'note', text: t('langNote') })),
     h('section', { class: 'card stack', style: 'gap:10px' }, h('div', { class: 'card-t', text: t('pushTitle') }), h('div', { class: 'note', text: t('pushBody') }), pushRow()),
+    h('button', { class: 'card between', style: 'border:0;width:100%;text-align:start;font:inherit;color:inherit;cursor:pointer', onclick: () => showCreatorNote(true) }, h('div', { class: 'card-t', text: noteTitle() }), h('span', { class: 'small', style: 'color:var(--pri)', text: '›' })),
     h('section', { class: 'card stack', style: 'gap:10px' }, h('div', { class: 'card-t', text: t('install') }),
       isStandalone() ? h('div', { text: t('installed') }) : deferredInstall ? h('button', { class: 'btn sm', style: 'align-self:flex-start', text: t('installBtn'), onclick: async () => { deferredInstall.prompt(); await deferredInstall.userChoice.catch(() => { }); deferredInstall = null; rerender(); } })
         : h('ol', { style: 'margin:0;padding-inline-start:20px;line-height:1.9;font-size:14px' }, steps.map(s => h('li', { text: t(s) })))),

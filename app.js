@@ -6,8 +6,10 @@ import { viewRoom, tick, pushPresence, restoreTimer } from './room.js';
 import { viewLife } from './life.js';
 import { viewDigest } from './digest.js';
 import { viewMe } from './me.js';
+import { showSplash, showCreatorNote } from './intro.js';
 
 applyLang();
+const splashDone = showSplash();
 const authErr = e => { const k = 'err_' + String((e && e.code) || '').replace('auth/', '').replace(/-/g, '_'); const v = t(k); return v === k ? t('errGeneric') : v; };
 
 /* ---------------- 登录 / 验证 ---------------- */
@@ -99,6 +101,7 @@ let started = null, globalSubs = [];
 function startApp(u) {
   if (started === u.uid) return;
   started = u.uid; S.uid = u.uid; S.email = u.email || '';
+  splashDone.then(() => setTimeout(() => showCreatorNote(), 400));
   globalSubs.forEach(f => f()); globalSubs = [];
   let first = true;
   globalSubs.push(B.on('profiles', v => {
