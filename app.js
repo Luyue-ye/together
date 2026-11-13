@@ -6,7 +6,7 @@ import { viewRoom, tick, pushPresence, restoreTimer } from './room.js';
 import { viewLife } from './life.js';
 import { viewDigest } from './digest.js';
 import { viewMe } from './me.js';
-import { showSplash, showCreatorNote } from './intro.js';
+import { showSplash, showCreatorNote, showTour } from './intro.js';
 
 applyLang();
 const splashDone = showSplash();
@@ -101,7 +101,7 @@ let started = null, globalSubs = [];
 function startApp(u) {
   if (started === u.uid) return;
   started = u.uid; S.uid = u.uid; S.email = u.email || '';
-  splashDone.then(() => setTimeout(() => showCreatorNote(), 400));
+  splashDone.then(() => new Promise(r => setTimeout(r, 400))).then(() => showCreatorNote()).then(() => setTimeout(() => showTour(), 250));
   globalSubs.forEach(f => f()); globalSubs = [];
   let first = true;
   globalSubs.push(B.on('profiles', v => {

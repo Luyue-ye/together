@@ -298,3 +298,24 @@ input[type=date]::-webkit-date-and-time-value,input[type=time]::-webkit-date-and
 .note-body p{margin:0 0 10px;unicode-bidi:plaintext}
 .note-sign{align-self:flex-end;color:var(--muted);font-size:14px;margin:-2px 4px 6px}
 html[dir=rtl] .note-sign{align-self:flex-start}
+
+/* 新手指引 */
+.tour-bg{position:fixed;inset:0;z-index:150;background:rgba(40,40,60,.38);display:flex;align-items:flex-end;justify-content:center;padding:20px 18px calc(110px + var(--safe-bot));transition:opacity .3s}
+.tour-bg.out{opacity:0}
+body.tour-on .nav{z-index:160}
+.tour-hi{position:relative;color:var(--pri)!important;font-weight:700}
+.nav a.tour-hi::before{content:"";position:absolute;inset:-4px 6px;border-radius:18px;background:var(--pri-soft);z-index:-1;animation:tour-pulse 1.4s ease-in-out infinite}
+a.tour-hi:not(.nav a){position:relative;z-index:160;border-radius:50%;box-shadow:0 0 0 6px rgba(255,255,255,.95),0 0 0 10px rgba(122,131,200,.5);animation:tour-pulse 1.4s ease-in-out infinite}
+@keyframes tour-pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.07)}}
+.tour-card{background:#fff;border-radius:28px;width:100%;max-width:420px;padding:20px 18px 16px;box-sizing:border-box;display:flex;flex-direction:column;gap:14px;animation:sp-pop .4s cubic-bezier(.3,1.4,.5,1) both}
+.tour-guide{display:flex;align-items:flex-end;gap:6px}
+.tour-mochi{width:92px;height:96px;flex:none;position:relative}
+.tour-mochi .mochi{position:absolute;left:-4px;bottom:0}
+.tour-bubble{flex:1;background:#f4f2fb;border-radius:20px 20px 20px 6px;padding:12px 14px;position:relative}
+html[dir=rtl] .tour-bubble{border-radius:20px 20px 6px 20px}
+.tour-title{font-family:var(--brand);font-weight:700;font-size:17px;margin-bottom:4px;unicode-bidi:plaintext}
+.tour-text{font-size:14px;line-height:1.65;color:var(--ink);unicode-bidi:plaintext}
+.tour-dots{display:flex;justify-content:center;gap:6px}
+.tour-dots i{width:6px;height:6px;border-radius:3px;background:#e2ddd2;transition:width .25s}
+.tour-dots i.on{width:18px;background:var(--pri)}
+.tour-btns{display:flex;gap:10px}
