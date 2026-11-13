@@ -18,9 +18,7 @@ jobs:
         with:
           node-version: 20
       - run: npm install --omit=dev
-        working-directory: scripts
       - run: node nightly.mjs
-        working-directory: scripts
         env:
           FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
           FIREBASE_DB_URL: ${{ secrets.FIREBASE_DB_URL }}
