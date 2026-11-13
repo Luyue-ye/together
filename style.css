@@ -44,6 +44,7 @@ a{color:var(--pri)}
 /* buttons */
 .btn{white-space:nowrap;flex:none;border:0;border-radius:16px;padding:0 18px;height:48px;font-weight:600;font-size:15px;background:var(--pri);color:#fff;display:inline-flex;align-items:center;justify-content:center;gap:6px}
 .btn.full{width:100%;flex:1 1 auto}
+.auth .btn.full{flex:none}
 .btn.ghost{background:var(--chip);color:var(--ink);font-weight:500}
 .btn.soft{background:var(--pri-soft);color:var(--pri-ink);font-weight:500}
 .btn.warm{background:var(--warm);color:#3a2a1a}
